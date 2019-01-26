@@ -3,18 +3,13 @@
 This is a Plasma 5 applet that acts as a spacer between applets. This plasmoid is coming from [Latte land](https://phabricator.kde.org/source/latte-dock/repository/master/) but it can also support Plasma panels.
 
 <p align="center">
-<img src="https://i.imgur.com/Zdjshmt.png" width="580"><br/>
-<i>Window Title left to Plasma 5 global menu</i>
+<img src="https://i.imgur.com/My9LlEh.png" width="580"><br/>
+<i>Latte Spacer between PlayBar2 and Plasma systray, all inside a Latte panel</i>
 </p>
 
 <p align="center">
-<img src="https://i.imgur.com/9Wy2BgP.png" width="580"><br/>
+<img src="https://i.imgur.com/wCNfoLr.png" width="580"><br/>
 <i>Appearance Settings</i>
-</p>
-
-<p align="center">
-<img src="https://i.imgur.com/cxBeWOI.png" width="580"><br/>
-<i>Behavior Settings</i>
 </p>
 
 # Requires
