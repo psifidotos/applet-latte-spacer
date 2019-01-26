@@ -28,49 +28,78 @@ Item{
 
     Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
 
+    Layout.fillWidth: horizontal && plasmoid.configuration.lengthType===2 || /*Expanded OR vertical Percentage*/
+                      !horizontal && plasmoid.configuration.lengthType===2 ? true : false
+    Layout.fillHeight: !horizontal && plasmoid.configuration.lengthType===2 || /*Expanded OR horizontal Percentage*/
+                       horizontal && plasmoid.configuration.lengthType===2 ? true : false
+
     z: 9999
     property bool horizontal: plasmoid.formFactor != PlasmaCore.Types.Vertical
+    property int lengthType: plasmoid.configuration.lengthType
 
     property int pixelStep: 10
     property int percentageStep: 20
 
     property Item latteDock
 
-    property int length: { //this is calculated in pixels
-        if (latteDock && plasmoid.configuration.usePercentage) {
-            return latteDock.iconSize * (plasmoid.configuration.lengthPercentage / 100);
-        } else {
-            return plasmoid.configuration.lengthPixels;
+    readonly property int thickness: horizontal ? root.height : root.width
+
+    property int length: {
+        //this is calculated in pixels
+        if (lengthType===0) { /*Pixels*/
+                    return plasmoid.configuration.lengthPixels;
+        } else if (lengthType===1) { /*Percentage*/
+            return thickness * (plasmoid.configuration.lengthPercentage / 100);
         }
+
+        return Infinity;
     }
 
     onLengthChanged: updateValues();
+    onLengthTypeChanged: updateValues();
     Component.onCompleted: updateValues()
 
     function updateValues() {
-        if (horizontal) {
-            Layout.minimumWidth = length;
-            Layout.preferredWidth = length;
-            Layout.maximumWidth = length;
+        if (lengthType !== 2) { /* !Expanded */
+            if (horizontal) {
+                Layout.minimumWidth = length;
+                Layout.preferredWidth = length;
+                Layout.maximumWidth = length;
+                Layout.minimumHeight = -1;
+                Layout.preferredHeight = -1;
+                Layout.maximumHeight = -1;
+            } else {
+                Layout.minimumHeight = length;
+                Layout.preferredHeight = length;
+                Layout.maximumHeight = length;
+                Layout.minimumWidth = -1;
+                Layout.preferredWidth = -1;
+                Layout.maximumWidth = -1;
+            }
         } else {
-            Layout.minimumHeight = length;
-            Layout.preferredHeight = length;
-            Layout.maximumHeight = length;
+            Layout.minimumWidth = -1;
+            Layout.preferredWidth = -1;
+            Layout.maximumWidth = -1;
+            Layout.minimumHeight = -1;
+            Layout.preferredHeight = -1;
+            Layout.maximumHeight = -1;
         }
     }
 
     function increaseLength() {
-        if (plasmoid.configuration.usePercentage)
+        if (lengthType === 0) { /*Pixels*/
+                    plasmoid.configuration.lengthPixels = plasmoid.configuration.lengthPixels + pixelStep;
+        } else if (lengthType === 1) { /*Percentage*/
             plasmoid.configuration.lengthPercentage = plasmoid.configuration.lengthPercentage + percentageStep;
-        else
-            plasmoid.configuration.lengthPixels = plasmoid.configuration.lengthPixels + pixelStep;
+        }
     }
 
     function decreaseLength() {
-        if (plasmoid.configuration.usePercentage)
+        if (lengthType === 0) { /*Pixels*/
+                    plasmoid.configuration.lengthPixels = Math.max(5, plasmoid.configuration.lengthPixels - pixelStep);
+        } else if (lengthType === 1) { /*Percentage*/
             plasmoid.configuration.lengthPercentage = Math.max(10, plasmoid.configuration.lengthPercentage - percentageStep);
-        else
-            plasmoid.configuration.lengthPixels = Math.max(5, plasmoid.configuration.lengthPixels - pixelStep);
+        }
     }
 
     Loader{

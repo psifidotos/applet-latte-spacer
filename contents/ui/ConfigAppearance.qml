@@ -1,6 +1,5 @@
 /*
-*  Copyright 2016  Smith AR <audoban@openmailbox.org>
-*                  Michail Vourlakos <mvourlakos@gmail.com>
+*  Copyright 2019  Michail Vourlakos <mvourlakos@gmail.com>
 *
 *  This file is part of Latte-Dock
 *
@@ -24,72 +23,111 @@ import QtQuick.Layouts 1.0
 import QtGraphicalEffects 1.0
 
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
 
 Item {
-    id: mainItem
+    id: root
 
-    width: 200
-    height: 200
+    property bool vertical: (plasmoid.formFactor === PlasmaCore.Types.Vertical)
 
-    property bool vertical: (plasmoid.formFactor == PlasmaCore.Types.Vertical)
+    property alias cfg_lengthType: root.lengthType
+    property alias cfg_lengthPixels: lengthPixels.value
+    property alias cfg_lengthPercentage: lengthPercentage.value
 
-    property alias cfg_usePixels: usePixels.checked
-    property alias cfg_lengthPixels: lengthPixels.text
-    property alias cfg_usePercentage: usePercentage.checked
-    property alias cfg_lengthPercentage: lengthPercentage.text
+    // used from the ui
+    readonly property real centerFactor: 0.3
+    readonly property int minimumWidth: 220
+    property int lengthType: 0
 
     ColumnLayout {
-        id:mainColumn
-        spacing: 15
-        width: parent.width-40
-
-        //Layout.fillWidth: true
+        spacing: units.largeSpacing
+        Layout.fillWidth: true
 
         GridLayout{
-            id: animationsGridLayout
-            //Layout.fillWidth: true
-            columns: 3
+            columns: 2
+            Label {
+                Layout.minimumWidth: Math.max(centerFactor * root.width, minimumWidth)
+                text: i18n("Length:")
+                horizontalAlignment: Text.AlignRight
+            }
 
-            CheckBox {
-                id: usePixels
-                text: i18n("Use pixels size, ")
-
-                onCheckedChanged: {
-                    if (checked && usePercentage.checked) {
-                        usePercentage.checked = false;
-                    }
+            ExclusiveGroup {
+                id: lengthTypeGroup
+                onCurrentChanged: {
+                    root.lengthType = current.type;
                 }
             }
 
-            TextField {
-                id: lengthPixels
-                maximumLength: 4
-            }
+            RowLayout {
+                RadioButton {
+                    id: usePixels
+                    checked: root.lengthType === type
+                    exclusiveGroup: lengthTypeGroup
 
-            Label{
-                text: "px."
-            }
+                    readonly property int type: 0 /*Pixels*/
+                }
 
+                SpinBox{
+                    id: lengthPixels
+                    Layout.minimumWidth: Math.max(lengthPixels.implicitWidth, lengthPercentage.implicitWidth)
 
-            CheckBox {
-                id: usePercentage
-                text: i18n("Use percentage, ")
-
-                onCheckedChanged: {
-                    if (checked && usePixels.checked) {
-                        usePixels.checked = false;
-                    }
+                    minimumValue: 0
+                    maximumValue: 1024
+                    stepSize: 10
+                    suffix: " " + i18nc("pixels","px.")
+                    enabled: usePixels.checked
                 }
             }
 
-            TextField {
-                id: lengthPercentage
-                maximumLength: 4
+            Label {}
+
+            RowLayout {
+                RadioButton {
+                    id: usePercentage
+                    checked: root.lengthType === type
+                    exclusiveGroup: lengthTypeGroup
+
+                    readonly property int type: 1 /*Percentage*/
+                }
+
+                SpinBox {
+                    id: lengthPercentage
+                    Layout.minimumWidth: Math.max(lengthPixels.implicitWidth, lengthPercentage.implicitWidth)
+
+                    minimumValue: 0
+                    maximumValue: 1000
+                    stepSize: 20
+                    suffix: " %"
+                    enabled: usePercentage.checked
+                }
+
+                Label {
+                    height: lengthPercentage.height
+                    text: " " + i18n(" of panel thickness")
+                    enabled: usePercentage.checked
+                }
             }
 
-            Label{
-                text: "%"
+            Label {}
+
+            RowLayout {
+                RadioButton {
+                    id: useExpanded
+                    checked: root.lengthType === type
+                    exclusiveGroup: lengthTypeGroup
+
+                    readonly property int type: 2 /*Exclusive*/
+                }
+
+                Label {
+                    height: lengthPercentage.height
+                    Layout.leftMargin: 4
+                    text: i18n("fill available space")
+                    enabled: useExpanded.checked
+                }
+
+                SpinBox {
+                    opacity: 0
+                }
             }
         }
     }
