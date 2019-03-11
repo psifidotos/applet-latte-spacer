@@ -44,7 +44,7 @@ Item{
     property int length: {
         //this is calculated in pixels
         if (lengthType===0) { /*Pixels*/
-                    return plasmoid.configuration.lengthPixels;
+            return plasmoid.configuration.lengthPixels;
         } else if (lengthType===1) { /*Percentage*/
             return thickness * (plasmoid.configuration.lengthPercentage / 100);
         } else if (lengthType === 3 && latteBridge) {
@@ -107,7 +107,7 @@ Item{
 
     function increaseLength() {
         if (lengthType === 0) { /*Pixels*/
-                    plasmoid.configuration.lengthPixels = plasmoid.configuration.lengthPixels + pixelStep;
+            plasmoid.configuration.lengthPixels = plasmoid.configuration.lengthPixels + pixelStep;
         } else if (lengthType === 1) { /*Percentage*/
             plasmoid.configuration.lengthPercentage = plasmoid.configuration.lengthPercentage + percentageStep;
         }
@@ -115,7 +115,7 @@ Item{
 
     function decreaseLength() {
         if (lengthType === 0) { /*Pixels*/
-                    plasmoid.configuration.lengthPixels = Math.max(5, plasmoid.configuration.lengthPixels - pixelStep);
+            plasmoid.configuration.lengthPixels = Math.max(5, plasmoid.configuration.lengthPixels - pixelStep);
         } else if (lengthType === 1) { /*Percentage*/
             plasmoid.configuration.lengthPercentage = Math.max(10, plasmoid.configuration.lengthPercentage - percentageStep);
         }
