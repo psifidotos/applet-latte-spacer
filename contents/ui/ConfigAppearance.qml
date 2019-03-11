@@ -74,7 +74,6 @@ Item {
                     maximumValue: 1024
                     stepSize: 10
                     suffix: " " + i18nc("pixels","px.")
-                    enabled: usePixels.checked
                 }
             }
 
@@ -97,13 +96,31 @@ Item {
                     maximumValue: 1000
                     stepSize: 20
                     suffix: " %"
-                    enabled: usePercentage.checked
                 }
 
                 Label {
                     height: lengthPercentage.height
                     text: " " + i18n(" of panel thickness")
-                    enabled: usePercentage.checked
+                }
+            }
+
+            Label {visible: plasmoid.configuration.containmentType === 2} /*Latte containmnent*/
+
+            RowLayout {
+                visible: plasmoid.configuration.containmentType === 2 /*Latte containmnent*/
+
+                RadioButton {
+                    id: latteIcon
+                    checked: root.lengthType === type
+                    exclusiveGroup: lengthTypeGroup
+
+                    readonly property int type: 3 /*Latte Icon*/
+                }
+
+                Label {
+                    height: lengthPercentage.height
+                    Layout.leftMargin: 4
+                    text: i18n("use Latte icon size")
                 }
             }
 
@@ -122,7 +139,6 @@ Item {
                     height: lengthPercentage.height
                     Layout.leftMargin: 4
                     text: i18n("fill available space")
-                    enabled: useExpanded.checked
                 }
 
                 SpinBox {

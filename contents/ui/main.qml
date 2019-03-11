@@ -33,8 +33,7 @@ Item{
     Layout.fillHeight: !horizontal && plasmoid.configuration.lengthType===2 || /*Expanded OR horizontal Percentage*/
                        horizontal && plasmoid.configuration.lengthType===2 ? true : false
 
-    z: 9999
-    property bool horizontal: plasmoid.formFactor != PlasmaCore.Types.Vertical
+    property bool horizontal: plasmoid.formFactor !== PlasmaCore.Types.Vertical
     property int lengthType: plasmoid.configuration.lengthType
 
     property int pixelStep: 10
@@ -50,14 +49,36 @@ Item{
                     return plasmoid.configuration.lengthPixels;
         } else if (lengthType===1) { /*Percentage*/
             return thickness * (plasmoid.configuration.lengthPercentage / 100);
+        } else if (lengthType === 3 && latteBridge) {
+            return latteBridge.iconSize;
         }
 
         return Infinity;
     }
 
+    //BEGIN Latte Dock Communicator
+    property QtObject latteBridge: null // current Latte v0.9 API
+
+    onLatteBridgeChanged: {
+        if (latteBridge) {
+            plasmoid.configuration.containmentType = 2; /*Latte containment with new API*/
+            latteBridge.actions.setProperty(plasmoid.id, "latteSideColoringEnabled", false);
+            updateValues();
+        }
+    }
+
+    //END  Latte Dock Communicator
+    //BEGIN Latte based properties
+    readonly property bool enforceLattePalette: latteBridge && latteBridge.applyPalette && latteBridge.palette
+    readonly property bool latteInEditMode: latteBridge && latteBridge.inEditMode
+    //END Latte based properties
+
     onLengthChanged: updateValues();
     onLengthTypeChanged: updateValues();
-    Component.onCompleted: updateValues()
+    Component.onCompleted: {
+        containmentIdentifierTimer.start();
+        updateValues();
+    }
 
     function updateValues() {
         if (lengthType !== 2) { /* !Expanded */
@@ -103,7 +124,7 @@ Item{
     }
 
     Loader{
-        active: latteDock && latteDock.editMode
+        active: latteInEditMode
         anchors.fill: parent
 
         sourceComponent: Rectangle{
@@ -113,6 +134,24 @@ Item{
             color: alphaBackColor
 
             property color alphaBackColor: Qt.rgba(theme.highlightColor.r, theme.highlightColor.g, theme.highlightColor.b, 0.5)
+        }
+    }
+
+    //! this timer is used in order to identify in which containment the applet is in
+    //! it should be called only the first time an applet is created and loaded because
+    //! afterwards the applet has no way to move between different processes such
+    //! as Plasma and Latte
+    Timer{
+        id: containmentIdentifierTimer
+        interval: 5000
+        onTriggered: {
+            if (latteBridge) {
+                plasmoid.configuration.containmentType = 2; /*Latte containment with new API*/
+            } else {
+                plasmoid.configuration.containmentType = 1; /*Plasma containment or Latte with old API*/
+            }
+
+            updateValues();
         }
     }
 }
