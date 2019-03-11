@@ -39,8 +39,6 @@ Item{
     property int pixelStep: 10
     property int percentageStep: 20
 
-    property Item latteDock
-
     readonly property int thickness: horizontal ? root.height : root.width
 
     property int length: {
