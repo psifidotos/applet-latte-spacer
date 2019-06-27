@@ -48,7 +48,7 @@ Item{
         } else if (lengthType===1) { /*Percentage*/
             return thickness * (plasmoid.configuration.lengthPercentage / 100);
         } else if (lengthType === 3 && latteBridge) {
-            return latteBridge.iconSize;
+            return -1; /*default Latte behavior - Square layout*/
         }
 
         return Infinity;
@@ -61,11 +61,19 @@ Item{
         if (latteBridge) {
             plasmoid.configuration.containmentType = 2; /*Latte containment with new API*/
             latteBridge.actions.setProperty(plasmoid.id, "latteSideColoringEnabled", false);
+            latteBridge.actions.setProperty(plasmoid.id, "lengthMarginsEnabled", latteBridge.parabolicEffectEnabled);
             updateValues();
         }
     }
 
+    Connections {
+        target: latteBridge
+        onParabolicEffectEnabledChanged: {
+            latteBridge.actions.setProperty(plasmoid.id, "lengthMarginsEnabled", latteBridge.parabolicEffectEnabled);
+        }
+    }
     //END  Latte Dock Communicator
+
     //BEGIN Latte based properties
     readonly property bool enforceLattePalette: latteBridge && latteBridge.applyPalette && latteBridge.palette
     readonly property bool latteInEditMode: latteBridge && latteBridge.inEditMode
