@@ -8,7 +8,7 @@ This is a Plasma 5 applet that acts as a spacer between applets. This plasmoid i
 </p>
 
 <p align="center">
-<img src="https://i.imgur.com/wCNfoLr.png" width="580"><br/>
+<img src="https://i.imgur.com/dr6rMrF.png" width="580"><br/>
 <i>Appearance Settings</i>
 </p>
 
